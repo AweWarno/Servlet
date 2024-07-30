@@ -11,9 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 public class MainServlet extends HttpServlet {
   private PostController controller;
 
-  private static String path;
-  private static String method;
-  private static Long id;
+  private static final String typeMethodGet = "GET";
+  private static final String matchesMethodGetAllPosts = "/api/posts";
+  private static final String matchesMethodGetOnePosts = "/api/posts/\\d+";
+  private static final String typeMethodPost = "POST";
+  private static final String matchesMethodPost = "/api/posts";
+  private static final String typeMethodDelete = "DELETE";
+  private static final String matchesMethodDelete = "/api/posts/\\d+";
 
   @Override
   public void init() {
@@ -26,26 +30,26 @@ public class MainServlet extends HttpServlet {
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
     // если деплоились в root context, то достаточно этого
     try {
-      path = req.getRequestURI();
-      method = req.getMethod();
+      var path = req.getRequestURI();
+      var method = req.getMethod();
       // primitive routing
-      if (method.equals("GET") && path.equals("/api/posts")) {
+      if (method.equals(typeMethodGet) && path.equals(matchesMethodGetAllPosts)) {
         controller.all(resp);
         return;
       }
-      if (method.equals("GET") && path.matches("/api/posts/\\d+")) {
+      if (method.equals(typeMethodGet) && path.matches(matchesMethodGetOnePosts)) {
         // easy way
-        id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+        var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
         controller.getById(id, resp);
         return;
       }
-      if (method.equals("POST") && path.equals("/api/posts")) {
+      if (method.equals(typeMethodPost) && path.equals(matchesMethodPost)) {
         controller.save(req.getReader(), resp);
         return;
       }
-      if (method.equals("DELETE") && path.matches("/api/posts/\\d+")) {
+      if (method.equals(typeMethodDelete) && path.matches(matchesMethodDelete)) {
         // easy way
-        id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+        var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
         controller.removeById(id, resp);
         return;
       }
